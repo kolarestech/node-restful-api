@@ -5,16 +5,30 @@ import { ProductsRepository } from '../typeorm/repositories/ProductsRepository';
 
 interface IRequest {
   id: string;
+  name: string;
+  price: number;
+  quantity: number;
 }
-export default class ShowProductService {
-  public async execute({ id }: IRequest): Promise<Product> {
+
+export default class CreateProductService {
+  public async execute({
+    id,
+    name,
+    price,
+    quantity,
+  }: IRequest): Promise<Product> {
     const productsRepository = getCustomRepository(ProductsRepository);
 
     const product = await productsRepository.findOne(id);
 
     if (!product) {
-      throw new AppError('product not found');
+      throw new AppError('Product not exists');
     }
+    product.name = name;
+    product.price = price;
+    product.quantity = quantity;
+
+    await productsRepository.save(product);
 
     return product;
   }
